@@ -1,0 +1,46 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - revive
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - unused
+    - misspell
+
+linters-settings:
+  revive:
+    rules:
+      - name: exported
+      - name: var-naming
+      - name: package-comments
+      - name: dot-imports
+      - name: blank-imports
+      - name: unexported-return
+      - name: errorf
+      - name: error-string
+      - name: error-naming
+      - name: if-return
+      - name: increment-decrement
+      - name: var-declaration
+      - name: range
+      - name: receiver-naming
+      - name: indent-error-flow
+      - name: superfluous-else
+      - name: modifies-parameter
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
