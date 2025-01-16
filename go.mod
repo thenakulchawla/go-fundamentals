@@ -3,7 +3,7 @@ module github.com/thenakulchawla/go-fundamentals
 go 1.22.0
 
 require (
-	github.com/alecthomas/kong v1.2.1
+	github.com/alecthomas/kong v1.6.1
 	github.com/rs/zerolog v1.33.0
 	go.uber.org/multierr v1.11.0
 	golang.org/x/sync v0.8.0

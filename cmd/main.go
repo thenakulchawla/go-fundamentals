@@ -6,14 +6,16 @@ import (
 	"github.com/thenakulchawla/go-fundamentals/internal/channels"
 	deferex "github.com/thenakulchawla/go-fundamentals/internal/defer"
 	egex "github.com/thenakulchawla/go-fundamentals/internal/errgroup"
+	"github.com/thenakulchawla/go-fundamentals/internal/producer"
 	wgex "github.com/thenakulchawla/go-fundamentals/internal/waitgroup"
 )
 
 var CLI struct {
-	Defer    DeferCmd `cmd:"defer" help:"Learn about defer"`
-	ErrGrp   EGCmd    `cmd:"errgrp" help:"Learn about error groups"`
-	WaitGrp  WGCmd    `cmd:"waitgrp" help:"Learn about wait groups"`
-	Channels ChanCmd  `cmd:"ch" help:"Learn about channels"`
+	Defer    DeferCmd    `cmd:"defer" help:"Learn about defer"`
+	ErrGrp   EGCmd       `cmd:"errgrp" help:"Learn about error groups"`
+	WaitGrp  WGCmd       `cmd:"waitgrp" help:"Learn about wait groups"`
+	Channels ChanCmd     `cmd:"ch" help:"Learn about channels"`
+	Producer ProducerCmd `cmd:"produce" help:"Run producer and consumer"`
 }
 
 type DeferCmd struct{}
@@ -38,6 +40,12 @@ type ChanCmd struct{}
 
 func (c *ChanCmd) Run() error {
 	return channels.RunExamples()
+}
+
+type ProducerCmd struct{}
+
+func (p *ProducerCmd) Run() error {
+	return producer.RunExamples()
 }
 
 func main() {

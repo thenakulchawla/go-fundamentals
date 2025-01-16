@@ -37,17 +37,14 @@ func baseWG(log zerolog.Logger) {
 
 func wgWithErrors(log zerolog.Logger) {
 	var wg sync.WaitGroup
-	var mu sync.Mutex
-	errors := make([]error, 0)
+	errors := make([]error, NUM_THREADS)
 
 	for i := 1; i <= 5; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			if err := worker.Work(id, true); err != nil {
-				mu.Lock()
-				errors = append(errors, err)
-				mu.Unlock()
+				errors[i] = err
 			}
 		}(i)
 	}
