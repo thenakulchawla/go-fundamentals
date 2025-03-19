@@ -1,6 +1,7 @@
 package producer
 
 import (
+	"context"
 	"math/rand"
 	"sync"
 	"time"
@@ -49,7 +50,7 @@ func (p *ChayConsumer) Consume(foodChan <-chan Food) {
 	}
 }
 
-func RunExamples() error {
+func RunExamples(ctx context.Context) error {
 	foodChan := make(chan Food, 10)
 
 	producers := []Producer{

@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
+
 	"github.com/alecthomas/kong"
-	"github.com/rs/zerolog/log"
 	"github.com/thenakulchawla/go-fundamentals/internal/channels"
 	deferex "github.com/thenakulchawla/go-fundamentals/internal/defer"
 	egex "github.com/thenakulchawla/go-fundamentals/internal/errgroup"
 	"github.com/thenakulchawla/go-fundamentals/internal/producer"
 	wgex "github.com/thenakulchawla/go-fundamentals/internal/waitgroup"
+	"github.com/thenakulchawla/parchment"
 )
 
 var CLI struct {
@@ -21,37 +23,46 @@ var CLI struct {
 type DeferCmd struct{}
 
 func (d *DeferCmd) Run() error {
-	return deferex.RunExamples()
+	ctx := context.Background()
+	ctx = parchment.New(ctx)
+	return deferex.RunExamples(ctx)
 }
 
 type EGCmd struct{}
 
 func (e *EGCmd) Run() error {
-	return egex.RunExamples()
+	ctx := context.Background()
+	ctx = parchment.New(ctx)
+	return egex.RunExamples(ctx)
 }
 
 type WGCmd struct{}
 
 func (w *WGCmd) Run() error {
-	return wgex.RunExamples()
+	ctx := context.Background()
+	ctx = parchment.New(ctx)
+	return wgex.RunExamples(ctx)
 }
 
 type ChanCmd struct{}
 
 func (c *ChanCmd) Run() error {
-	return channels.RunExamples()
+	ctx := context.Background()
+	ctx = parchment.New(ctx)
+	return channels.RunExamples(ctx)
 }
 
 type ProducerCmd struct{}
 
 func (p *ProducerCmd) Run() error {
-	return producer.RunExamples()
+	ctx := context.Background()
+	ctx = parchment.New(ctx)
+	return producer.RunExamples(ctx)
 }
 
 func main() {
-	log.Info().Msg("starting examples")
 
-	ctx := kong.Parse(&CLI)
-	err := ctx.Run()
-	ctx.FatalIfErrorf(err)
+	cmd := kong.Parse(&CLI)
+	err := cmd.Run()
+	cmd.FatalIfErrorf(err)
 }

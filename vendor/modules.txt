@@ -13,6 +13,9 @@ github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
+# github.com/thenakulchawla/parchment v0.0.0-20250319051921-d6792ba58312
+## explicit; go 1.22.0
+github.com/thenakulchawla/parchment
 # go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
 go.uber.org/multierr

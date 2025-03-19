@@ -1,17 +1,21 @@
 package channels
 
 import (
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"context"
+
+	"github.com/thenakulchawla/parchment"
 )
 
-func RunExamples() error {
-	log := log.With().Str("program", "channels").Logger()
-	basicChannelBuffered(log)
+func RunExamples(ctx context.Context) error {
+	ctx = parchment.AddToLogger(ctx, []parchment.LoggerField{
+		{Key: "program", Value: "channels"},
+	})
+	basicChannelBuffered(ctx)
 	return nil
 }
 
-func basicChannelBuffered(log zerolog.Logger) {
+func basicChannelBuffered(ctx context.Context) {
+	log := parchment.FromContext(ctx)
 
 	log.Info().Msg("basic channels")
 
@@ -30,6 +34,6 @@ func basicChannelBuffered(log zerolog.Logger) {
 
 }
 
-func basicChannelUnbuffered(log zerolog.Logger) {
+func basicChannelUnbuffered(ctx context.Context) {
 
 }

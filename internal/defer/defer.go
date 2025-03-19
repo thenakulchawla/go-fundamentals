@@ -2,27 +2,30 @@
 package deferex
 
 import (
+	"context"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/thenakulchawla/parchment"
 )
 
-func RunExamples() error {
+func RunExamples(ctx context.Context) error {
 
-	log := log.With().Str("program", "defer").Logger()
+	ctx = parchment.AddToLogger(ctx, []parchment.LoggerField{
+		{Key: "program", Value: "defer"},
+	})
+
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("running examples")
-
-	// basicDefer(log)
-	// orderedDefers(log)
-	// defersWithSleep(log)
-	deferWithArgs(log)
+	basicDefer(ctx)
+	orderedDefers(ctx)
+	defersWithSleep(ctx)
+	deferWithArgs(ctx)
 
 	return nil
 }
 
-func basicDefer(log zerolog.Logger) {
-
+func basicDefer(ctx context.Context) {
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("running basic defer")
 	defer log.Info().Msg("this is the deferred log")
 
@@ -30,7 +33,8 @@ func basicDefer(log zerolog.Logger) {
 
 }
 
-func orderedDefers(log zerolog.Logger) {
+func orderedDefers(ctx context.Context) {
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("running multiple defers")
 
 	defer log.Info().Msg("exit ordered defers")
@@ -42,7 +46,10 @@ func orderedDefers(log zerolog.Logger) {
 	defer log.Info().Msg("scheduling defers")
 }
 
-func defersWithSleep(log zerolog.Logger) {
+func defersWithSleep(ctx context.Context) {
+
+	log := parchment.FromContext(ctx)
+
 	log.Info().Msg("defers with sleep")
 
 	defer log.Info().Msg("the last message")
@@ -51,7 +58,8 @@ func defersWithSleep(log zerolog.Logger) {
 	log.Info().Msg("first sleep then print the last message")
 }
 
-func deferWithArgs(log zerolog.Logger) {
+func deferWithArgs(ctx context.Context) {
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("defer with args")
 
 	defer log.Info().Msg("exiting defer with args")

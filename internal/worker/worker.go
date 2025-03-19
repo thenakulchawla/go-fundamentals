@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -8,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Work(id int, err bool) error {
+func Work(ctx context.Context, id int, err bool) error {
 	log.Info().Int("worker", id).Msg("Worker starting")
 
 	// 30% chance of error

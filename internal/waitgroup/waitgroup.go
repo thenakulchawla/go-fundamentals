@@ -1,24 +1,27 @@
 package wgex
 
 import (
+	"context"
 	"sync"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/thenakulchawla/go-fundamentals/internal/worker"
+	"github.com/thenakulchawla/parchment"
 )
 
 const NUM_THREADS = 5
 
-func RunExamples() error {
+func RunExamples(ctx context.Context) error {
 
-	log := log.With().Str("program", "wait_groups").Logger()
-	// baseWG(log)
-	wgWithErrors(log)
+	ctx = parchment.AddToLogger(ctx, []parchment.LoggerField{
+		{Key: "program", Value: "wait_groups"},
+	})
+
+	// baseWG(ctx)
+	wgWithErrors(ctx)
 	return nil
 }
 
-func baseWG(log zerolog.Logger) {
+func baseWG(ctx context.Context) {
 
 	var wg sync.WaitGroup
 
@@ -26,16 +29,17 @@ func baseWG(log zerolog.Logger) {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			worker.Work(id, false)
+			worker.Work(ctx, id, false)
 		}(i)
 	}
 
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("Waiting for all workers to complete...")
 	wg.Wait()
 
 }
 
-func wgWithErrors(log zerolog.Logger) {
+func wgWithErrors(ctx context.Context) {
 	var wg sync.WaitGroup
 	errors := make([]error, NUM_THREADS)
 
@@ -43,12 +47,13 @@ func wgWithErrors(log zerolog.Logger) {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			if err := worker.Work(id, true); err != nil {
+			if err := worker.Work(ctx, id, true); err != nil {
 				errors[i] = err
 			}
 		}(i)
 	}
 
+	log := parchment.FromContext(ctx)
 	log.Info().Msg("Waiting for all workers to complete...")
 	wg.Wait()
 

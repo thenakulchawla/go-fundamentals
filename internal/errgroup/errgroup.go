@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/thenakulchawla/go-fundamentals/internal/worker"
+	"github.com/thenakulchawla/parchment"
 	"go.uber.org/multierr"
 	"golang.org/x/sync/errgroup"
 )
 
 const NUM_THREADS = 5
 
-func RunExamples() error {
-	log := log.With().Str("program", "error_groups").Logger()
+func RunExamples(ctx context.Context) error {
+	ctx = parchment.AddToLogger(ctx, []parchment.LoggerField{
+		{Key: "program", Value: "error_groups"},
+	})
+	log := parchment.FromContext(ctx)
 
 	// log.Info().Msg("Running waitForAll example")
 	// if err := waitForAll(log); err != nil {
@@ -28,7 +30,7 @@ func RunExamples() error {
 	// }
 
 	log.Info().Msg("Running combineErrors example")
-	if err := collectAllErrorsMultiErr(log); err != nil {
+	if err := collectAllErrorsMultiErr(ctx); err != nil {
 		log.Error().Err(err).Msg("combineErrors encountered errors")
 		// Unwrap and log individual errors
 		for i, err := range multierr.Errors(err) {
@@ -39,15 +41,16 @@ func RunExamples() error {
 	return nil
 }
 
-func waitForAll(log zerolog.Logger) error {
+func waitForAll(ctx context.Context) error {
 	g := new(errgroup.Group)
 
 	for i := 0; i < NUM_THREADS; i++ {
 		id := i
 		g.Go(func() error {
-			return worker.Work(id, true)
+			return worker.Work(ctx, id, true)
 		})
 	}
+	log := parchment.FromContext(ctx)
 
 	log.Info().Msg("Waiting for all workers to complete...")
 	if err := g.Wait(); err != nil {
@@ -58,13 +61,14 @@ func waitForAll(log zerolog.Logger) error {
 	return nil
 }
 
-func showFirstError(log zerolog.Logger) error {
+func showFirstError(ctx context.Context) error {
+	log := parchment.FromContext(ctx)
 	var g errgroup.Group
 
 	for i := 0; i < NUM_THREADS; i++ {
 		id := i
 		g.Go(func() error {
-			err := worker.Work(id, true)
+			err := worker.Work(ctx, id, true)
 			if err != nil {
 				log.Error().Int("worker", id).Err(err).Msg("Worker encountered an error")
 				return err // This will signal the errgroup to stop waiting and return this error
@@ -95,7 +99,8 @@ X                             Thread 1 (Error)
 g.Wait() returns here with Thread 1's error
 ***/
 
-func collectAllErrorsMultiErr(log zerolog.Logger) error {
+func collectAllErrorsMultiErr(ctx context.Context) error {
+	log := parchment.FromContext(ctx)
 	var g errgroup.Group
 	var combinedErr error
 	var errMutex sync.Mutex
@@ -103,7 +108,7 @@ func collectAllErrorsMultiErr(log zerolog.Logger) error {
 	for i := 0; i < NUM_THREADS; i++ {
 		id := i
 		g.Go(func() error {
-			err := worker.Work(id, true)
+			err := worker.Work(ctx, id, true)
 			if err != nil {
 				log.Error().Int("worker", id).Err(err).Msg("Worker encountered an error")
 				errMutex.Lock()
@@ -128,11 +133,12 @@ func collectAllErrorsMultiErr(log zerolog.Logger) error {
 	return nil
 }
 
-func cancelOnFirstErrorWithContext(log zerolog.Logger) error {
+func cancelOnFirstErrorWithContext(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel() // Ensure all resources are cleaned up
 
 	g, ctx := errgroup.WithContext(ctx)
+	log := parchment.FromContext(ctx)
 
 	for i := 0; i < NUM_THREADS; i++ {
 		id := i
@@ -142,7 +148,7 @@ func cancelOnFirstErrorWithContext(log zerolog.Logger) error {
 				log.Info().Int("worker", id).Msg("Worker cancelled due to error in another goroutine")
 				return ctx.Err()
 			default:
-				err := worker.Work(id, true)
+				err := worker.Work(ctx, id, true)
 				if err != nil {
 					log.Error().Int("worker", id).Err(err).Msg("Worker encountered an error")
 					return err // This will cancel the context for other goroutines
